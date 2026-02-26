@@ -1,0 +1,32 @@
+# Archivos Excel y reportes locales (no van al repositorio)
+*.xlsx
+*.pdf
+*.csv
+
+# Scripts PowerShell locales (no son parte del sistema web)
+ACTUALIZAR_BD.ps1
+BUILD_DB.ps1
+CREAR_FORMULARIOS.ps1
+GENERAR_BASE_DATOS.ps1
+GENERAR_REPORTE.ps1
+genera_planilla_onepage.py
+
+# Carpeta de formularios locales
+FORMULARIOS/
+REPORTES/
+
+# Carpetas de datos anuales locales
+2023/
+2024/
+2025/
+2026/
+
+# Archivos del sistema
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Archivos temporales
+*.tmp
+*.log
+~$*
