@@ -775,46 +775,104 @@ function setupInitialData() {
   const shUM = ss.getSheetByName(SHEET_USUARIOS_MODULOS);
   if (shUM.getLastRow() <= 1) {
     // admin no necesita asignaciones (acceso total por rol)
-    // coordinador con múltiples módulos
-    shUM.appendRow(['coordinador1', 'SOCIAL',    'TRUE']);
+    // coordinador con todos los módulos
     shUM.appendRow(['coordinador1', 'TH',        'TRUE']);
-    shUM.appendRow(['coordinador1', 'LOGISTICA', 'TRUE']);
-    shUM.appendRow(['social1',      'SOCIAL',    'TRUE']);
+    shUM.appendRow(['coordinador1', 'SSL',       'TRUE']);
+    shUM.appendRow(['coordinador1', 'REDES',     'TRUE']);
+    shUM.appendRow(['coordinador1', 'QCYS',      'TRUE']);
+    shUM.appendRow(['coordinador1', 'PROGRAMAS', 'TRUE']);
+    // social1 → solo módulos sociales
+    shUM.appendRow(['social1',      'QCYS',      'TRUE']);
+    shUM.appendRow(['social1',      'PROGRAMAS', 'TRUE']);
+    shUM.appendRow(['social1',      'REDES',     'TRUE']);
+    // th1 → solo TH y SSL
     shUM.appendRow(['th1',          'TH',        'TRUE']);
+    shUM.appendRow(['th1',          'SSL',       'TRUE']);
   }
 
-  // 9. Indicadores ejemplo (SSL_INDUSTRIAL, TH, SOCIAL)
+  // 9. Indicadores reales del One Page — catálogo completo
   const shInd = ss.getSheetByName(SHEET_INDICADORES);
   if (shInd.getLastRow() <= 1) {
     const inds = [
-      ['TH_001','TH','Total de empleados directos','personas','ENTERO','TRUE','MIN:0','1','TRUE','Número total de empleados con contrato directo a fin de mes','Incluir solo contratos vigentes al último día del mes'],
-      ['TH_002','TH','Total de empleados contratistas','personas','ENTERO','TRUE','MIN:0','2','TRUE','Número de empleados de empresas contratistas operando en planta','Promedio del mes o al último día'],
-      ['TH_003','TH','Nuevas contrataciones en el mes','personas','ENTERO','FALSE','MIN:0','3','TRUE','Ingresos en el período',''],
-      ['TH_004','TH','Desvinculaciones en el mes','personas','ENTERO','FALSE','MIN:0','4','TRUE','Bajas en el período','Incluir renuncias, despidos y jubilaciones'],
-      ['TH_005','TH','Tasa de rotación mensual','%','PORCENTAJE','TRUE','MIN:0,MAX:100','5','TRUE','(Desvinculaciones / Total empleados) x 100','Calcular al cierre del mes'],
-      ['TH_006','TH','Horas de capacitación total','horas','NUMERO','FALSE','MIN:0','6','TRUE','Suma total de horas de formación impartidas en el mes','Presencial + virtual'],
-      ['TH_007','TH','Porcentaje de empleadas mujeres','%','PORCENTAJE','TRUE','MIN:0,MAX:100','7','TRUE','(Empleadas mujeres / Total empleados) x 100',''],
-      ['SOC_001','SOCIAL','Comunidades visitadas en el mes','cantidad','ENTERO','TRUE','MIN:0','1','TRUE','Número de comunidades con visita presencial de relacionamiento',''],
-      ['SOC_002','SOCIAL','Reuniones con líderes comunitarios','cantidad','ENTERO','TRUE','MIN:0','2','TRUE','Reuniones formales e informales con líderes',''],
-      ['SOC_003','SOCIAL','Beneficiarios de programas sociales','personas','ENTERO','TRUE','MIN:0','3','TRUE','Cantidad de personas beneficiadas por programas sociales del mes',''],
-      ['SOC_004','SOCIAL','Compromisos sociales vencidos','cantidad','ENTERO','TRUE','MIN:0','4','TRUE','Compromisos con comunidades que vencieron en el mes sin cumplir','Deben ser accionados en el mes siguiente'],
-      ['SOC_005','SOCIAL','Compromisos sociales cumplidos','cantidad','ENTERO','TRUE','MIN:0','5','TRUE','Compromisos cumplidos en el mes',''],
-      ['SOC_006','SOCIAL','Índice de percepción positiva (%)','%','PORCENTAJE','FALSE','MIN:0,MAX:100','6','TRUE','Porcentaje de percepciones positivas sobre PARACEL en la comunidad','Basado en encuesta o reporte de Asuntos Comunitarios'],
-      ['SSL_001','SSL_INDUSTRIAL','Accidentes con tiempo perdido','cantidad','ENTERO','TRUE','MIN:0','1','TRUE','Accidentes que generaron ausencia del trabajador',''],
-      ['SSL_002','SSL_INDUSTRIAL','Índice de frecuencia de accidentes','IF','DECIMAL','TRUE','MIN:0','2','TRUE','(Accidentes x 1.000.000) / Horas trabajadas','Calculado por SSOMA'],
-      ['SSL_003','SSL_INDUSTRIAL','Horas trabajadas en el mes','horas','NUMERO','TRUE','MIN:0','3','TRUE','Total de horas-hombre trabajadas en el período','Incluir contratistas'],
-      ['FOR_001','FORESTAL','Hectáreas plantadas en el mes','ha','DECIMAL','TRUE','MIN:0','1','TRUE','Superficie plantada en el período',''],
-      ['FOR_002','FORESTAL','Hectáreas cosechadas en el mes','ha','DECIMAL','FALSE','MIN:0','2','TRUE','Superficie con cosecha finalizada en el período',''],
-      ['LOG_001','LOGISTICA','Viajes de transporte realizados','viajes','ENTERO','TRUE','MIN:0','1','TRUE','Total de viajes de transporte de producto en el mes',''],
-      ['LOG_002','LOGISTICA','Toneladas transportadas','ton','DECIMAL','TRUE','MIN:0','2','TRUE','Toneladas de materia prima o producto transportadas',''],
-      ['AMB_001','AMBIENTAL','Consumo de agua (m³)','m³','DECIMAL','TRUE','MIN:0','1','TRUE','Volumen total de agua captada y utilizada en planta',''],
-      ['AMB_002','AMBIENTAL','Residuos peligrosos generados (kg)','kg','DECIMAL','TRUE','MIN:0','2','TRUE','Peso de residuos peligrosos generados en el mes',''],
-      ['COM_001','COMPRAS','Órdenes de compra emitidas','cantidad','ENTERO','TRUE','MIN:0','1','TRUE','Número de órdenes de compra generadas en el mes',''],
-      ['COM_002','COMPRAS','Monto total de compras (USD)','USD','DECIMAL','TRUE','MIN:0','2','TRUE','Valor total de compras del mes en dólares',''],
-      ['FIN_001','FINANZAS','Ingresos del mes (USD)','USD','DECIMAL','TRUE','','1','TRUE','Ingresos operacionales del mes',''],
-      ['FIN_002','FINANZAS','Gastos operativos del mes (USD)','USD','DECIMAL','TRUE','','2','TRUE','Gastos operativos totales del mes',''],
-      ['IND_001','INDUSTRIAL','Producción total (ton)','ton','DECIMAL','TRUE','MIN:0','1','TRUE','Toneladas producidas en el mes',''],
-      ['IND_002','INDUSTRIAL','Eficiencia de planta (%)','%','PORCENTAJE','TRUE','MIN:0,MAX:100','2','TRUE','(Producción real / Producción planificada) x 100','']
+      // ═══ TALENTO HUMANO (TH) — por componente ═══
+      // Industrial
+      ['TH_IND_MUJ','TH','Mujeres — Industrial','personas','ENTERO','TRUE','MIN:0','1','TRUE','Cantidad de mujeres empleadas directas en el componente Industrial','Al cierre del mes'],
+      ['TH_IND_HOM','TH','Hombres — Industrial','personas','ENTERO','TRUE','MIN:0','2','TRUE','Cantidad de hombres empleados directos en el componente Industrial','Al cierre del mes'],
+      // Forestal
+      ['TH_FOR_MUJ','TH','Mujeres — Forestal','personas','ENTERO','TRUE','MIN:0','3','TRUE','Cantidad de mujeres empleadas directas en el componente Forestal',''],
+      ['TH_FOR_HOM','TH','Hombres — Forestal','personas','ENTERO','TRUE','MIN:0','4','TRUE','Cantidad de hombres empleados directos en el componente Forestal',''],
+      // Paracel (corporativo)
+      ['TH_PAR_MUJ','TH','Mujeres — Paracel (Corp.)','personas','ENTERO','TRUE','MIN:0','5','TRUE','Cantidad de mujeres en funciones corporativas/administrativas',''],
+      ['TH_PAR_HOM','TH','Hombres — Paracel (Corp.)','personas','ENTERO','TRUE','MIN:0','6','TRUE','Cantidad de hombres en funciones corporativas/administrativas',''],
+      // Total (puede ser calc., pero pedimos input para control)
+      ['TH_TOT_MUJ','TH','Total Mujeres — PARACEL','personas','ENTERO','TRUE','MIN:0','7','TRUE','Total de mujeres empleadas (Industrial + Forestal + Corp.)','Verificar que sea la suma'],
+      ['TH_TOT_HOM','TH','Total Hombres — PARACEL','personas','ENTERO','TRUE','MIN:0','8','TRUE','Total de hombres empleados (Industrial + Forestal + Corp.)','Verificar que sea la suma'],
+
+      // ═══ SALUD Y SEGURIDAD LABORAL (SSL) — por componente ═══
+      // Industrial
+      ['SSL_IND_TASA','SSL','Tasa de accidentabilidad — Industrial','tasa','DECIMAL','TRUE','MIN:0','1','TRUE','(N° accidentes × 200.000) / HH trabajadas en el período','Fórmula estándar OSHA'],
+      ['SSL_IND_HORAS','SSL','Horas HH sin accidentes — Industrial','horas','NUMERO','TRUE','MIN:0','2','TRUE','Horas hombre acumuladas sin accidente con tiempo perdido','Se reinicia a cero después de cada accidente'],
+      ['SSL_IND_NACC','SSL','N° de accidentes — Industrial','cantidad','ENTERO','TRUE','MIN:0','3','TRUE','Cantidad de accidentes con tiempo perdido en el mes','Solo accidentes con baja'],
+      ['SSL_IND_DIAS','SSL','Días perdidos — Industrial','días','ENTERO','FALSE','MIN:0','4','TRUE','Total de días de baja laboral por accidentes en el mes',''],
+      ['SSL_IND_HHT','SSL','HH trabajadas en el mes — Industrial','horas','NUMERO','TRUE','MIN:0','5','TRUE','Total horas-hombre trabajadas en el período','Incluir contratistas del componente'],
+      // Forestal
+      ['SSL_FOR_TASA','SSL','Tasa de accidentabilidad — Forestal','tasa','DECIMAL','TRUE','MIN:0','6','TRUE','(N° accidentes × 200.000) / HH trabajadas en el período','Fórmula estándar OSHA'],
+      ['SSL_FOR_HORAS','SSL','Horas HH sin accidentes — Forestal','horas','NUMERO','TRUE','MIN:0','7','TRUE','Horas hombre acumuladas sin accidente con tiempo perdido','Se reinicia a cero después de cada accidente'],
+      ['SSL_FOR_NACC','SSL','N° de accidentes — Forestal','cantidad','ENTERO','TRUE','MIN:0','8','TRUE','Cantidad de accidentes con tiempo perdido en el mes','Solo accidentes con baja'],
+      ['SSL_FOR_DIAS','SSL','Días perdidos — Forestal','días','ENTERO','FALSE','MIN:0','9','TRUE','Total de días de baja laboral por accidentes en el mes',''],
+      ['SSL_FOR_HHT','SSL','HH trabajadas en el mes — Forestal','horas','NUMERO','TRUE','MIN:0','10','TRUE','Total horas-hombre trabajadas en el período','Incluir contratistas del componente'],
+      // Observaciones generales
+      ['SSL_OBS','SSL','Observaciones de seguridad','','TEXTO','FALSE','','11','TRUE','Novedades relevantes en seguridad y salud del mes','Eventos destacados, mejoras, incidentes sin baja, etc.'],
+
+      // ═══ REDES SOCIALES (REDES) — por red ═══
+      // Instagram
+      ['RED_IG_SEG','REDES','Seguidores — Instagram','seguidores','ENTERO','TRUE','MIN:0','1','TRUE','Total de seguidores al último día del mes',''],
+      ['RED_IG_ALC','REDES','Alcance — Instagram','personas','ENTERO','FALSE','MIN:0','2','TRUE','Cuentas alcanzadas en el mes','Dato de Instagram Analytics'],
+      ['RED_IG_PUB','REDES','Publicaciones — Instagram','cantidad','ENTERO','FALSE','MIN:0','3','TRUE','Cantidad de publicaciones realizadas en el mes','Posts + Stories + Reels'],
+      ['RED_IG_INT','REDES','Interacciones — Instagram','cantidad','ENTERO','FALSE','MIN:0','4','TRUE','Total de interacciones (likes, comentarios, shares, guardados)',''],
+      // Facebook
+      ['RED_FB_SEG','REDES','Seguidores — Facebook','seguidores','ENTERO','TRUE','MIN:0','5','TRUE','Total de seguidores al último día del mes',''],
+      ['RED_FB_ALC','REDES','Alcance — Facebook','personas','ENTERO','FALSE','MIN:0','6','TRUE','Cuentas alcanzadas en el mes',''],
+      ['RED_FB_PUB','REDES','Publicaciones — Facebook','cantidad','ENTERO','FALSE','MIN:0','7','TRUE','Cantidad de publicaciones realizadas en el mes',''],
+      ['RED_FB_INT','REDES','Interacciones — Facebook','cantidad','ENTERO','FALSE','MIN:0','8','TRUE','Total de interacciones',''],
+      // LinkedIn
+      ['RED_LI_SEG','REDES','Seguidores — LinkedIn','seguidores','ENTERO','TRUE','MIN:0','9','TRUE','Total de seguidores al último día del mes',''],
+      ['RED_LI_ALC','REDES','Alcance — LinkedIn','personas','ENTERO','FALSE','MIN:0','10','TRUE','Impresiones o alcance en el mes',''],
+      ['RED_LI_PUB','REDES','Publicaciones — LinkedIn','cantidad','ENTERO','FALSE','MIN:0','11','TRUE','Cantidad de publicaciones realizadas en el mes',''],
+      ['RED_LI_INT','REDES','Interacciones — LinkedIn','cantidad','ENTERO','FALSE','MIN:0','12','TRUE','Total de interacciones',''],
+      // Twitter / X
+      ['RED_TW_SEG','REDES','Seguidores — Twitter/X','seguidores','ENTERO','FALSE','MIN:0','13','TRUE','Total de seguidores al último día del mes',''],
+      ['RED_TW_ALC','REDES','Alcance — Twitter/X','personas','ENTERO','FALSE','MIN:0','14','TRUE','Impresiones en el mes',''],
+      ['RED_TW_PUB','REDES','Publicaciones — Twitter/X','cantidad','ENTERO','FALSE','MIN:0','15','TRUE','Cantidad de tweets y retweets',''],
+      ['RED_TW_INT','REDES','Interacciones — Twitter/X','cantidad','ENTERO','FALSE','MIN:0','16','TRUE','Total de interacciones',''],
+      // YouTube
+      ['RED_YT_SEG','REDES','Suscriptores — YouTube','suscriptores','ENTERO','FALSE','MIN:0','17','TRUE','Total de suscriptores al último día del mes',''],
+      ['RED_YT_VIS','REDES','Visualizaciones — YouTube','views','ENTERO','FALSE','MIN:0','18','TRUE','Total de visualizaciones en el mes',''],
+      ['RED_YT_PUB','REDES','Videos publicados — YouTube','cantidad','ENTERO','FALSE','MIN:0','19','TRUE','Cantidad de videos publicados en el mes',''],
+      ['RED_YT_HRS','REDES','Horas de reproducción — YouTube','horas','DECIMAL','FALSE','MIN:0','20','TRUE','Horas totales de reproducción en el mes',''],
+
+      // ═══ QUEJAS, CONSULTAS Y SUGERENCIAS (QCYS) ═══
+      ['QC_QUEJA','QCYS','Quejas recibidas','cantidad','ENTERO','TRUE','MIN:0','1','TRUE','Total de quejas recibidas en el mes','De cualquier grupo de interés'],
+      ['QC_CONSULTA','QCYS','Consultas recibidas','cantidad','ENTERO','TRUE','MIN:0','2','TRUE','Total de consultas recibidas en el mes',''],
+      ['QC_SUGERENCIA','QCYS','Sugerencias recibidas','cantidad','ENTERO','TRUE','MIN:0','3','TRUE','Total de sugerencias recibidas en el mes',''],
+      ['QC_RECLAMO','QCYS','Reclamos recibidos','cantidad','ENTERO','TRUE','MIN:0','4','TRUE','Total de reclamos formales recibidos en el mes',''],
+      ['QC_EMPLEO','QCYS','Solicitudes de empleo','cantidad','ENTERO','TRUE','MIN:0','5','TRUE','Total de solicitudes de empleo recibidas de comunidades',''],
+      ['QC_OTROS','QCYS','Otros','cantidad','ENTERO','FALSE','MIN:0','6','TRUE','Otros tipos de comunicaciones recibidas',''],
+      ['QC_RESUELTAS','QCYS','Total resueltas en el mes','cantidad','ENTERO','TRUE','MIN:0','7','TRUE','Cantidad total de casos resueltos en el mes','De cualquier tipo'],
+      ['QC_PENDIENTES','QCYS','Total pendientes al cierre','cantidad','ENTERO','TRUE','MIN:0','8','TRUE','Cantidad total de casos pendientes al cierre del mes','Incluir arrastres de meses anteriores'],
+      ['QC_COMUNIDAD','QCYS','Casos de comunidad local','cantidad','ENTERO','FALSE','MIN:0','9','TRUE','Cantidad de casos provenientes de comunidades locales',''],
+      ['QC_PROVEEDOR','QCYS','Casos de proveedores','cantidad','ENTERO','FALSE','MIN:0','10','TRUE','Cantidad de casos provenientes de proveedores o contratistas',''],
+      ['QC_OBS','QCYS','Observaciones QCyS','','TEXTO','FALSE','','11','TRUE','Resumen de novedades relevantes en quejas/consultas del mes',''],
+
+      // ═══ PROGRAMAS SOCIALES (PROGRAMAS) ═══
+      ['PRG_BENEFICIARIOS','PROGRAMAS','Total de beneficiarios/as','personas','ENTERO','TRUE','MIN:0','1','TRUE','Personas beneficiadas por programas sociales en el mes','Contar personas únicas, no repetidas entre programas'],
+      ['PRG_COMUNIDADES','PROGRAMAS','Comunidades alcanzadas','cantidad','ENTERO','TRUE','MIN:0','2','TRUE','Número de comunidades donde se ejecutaron programas',''],
+      ['PRG_INVERSION','PROGRAMAS','Inversión social del mes (USD)','USD','DECIMAL','FALSE','MIN:0','3','TRUE','Monto total invertido en programas sociales en el mes','En dólares americanos'],
+      ['PRG_ACTIVIDADES','PROGRAMAS','Actividades realizadas','cantidad','ENTERO','TRUE','MIN:0','4','TRUE','Número de actividades o eventos de programas realizados','Talleres, charlas, jornadas, donaciones, etc.'],
+      ['PRG_EDUCACION','PROGRAMAS','Beneficiarios/as — Educación','personas','ENTERO','FALSE','MIN:0','5','TRUE','Personas beneficiadas por programas educativos','Becas, infraestructura escolar, kit escolares'],
+      ['PRG_SALUD','PROGRAMAS','Beneficiarios/as — Salud','personas','ENTERO','FALSE','MIN:0','6','TRUE','Personas beneficiadas por programas de salud','Jornadas médicas, insumos, campañas'],
+      ['PRG_INFRAESTRUCTURA','PROGRAMAS','Infraestructura comunitaria entregada','cantidad','ENTERO','FALSE','MIN:0','7','TRUE','Obras o mejoras de infraestructura comunitaria entregadas','Caminos, pozos, edificios, etc.'],
+      ['PRG_OBS','PROGRAMAS','Observaciones de programas','','TEXTO','FALSE','','8','TRUE','Descripción breve de los programas ejecutados en el mes','']
     ];
     inds.forEach(row => shInd.appendRow(row));
   }

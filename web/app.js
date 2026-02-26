@@ -10,15 +10,11 @@ const CONFIG = {
   TOKEN_KEY: 'paracel_token',
   SESSION_KEY: 'paracel_session',
   MODULOS_LABELS: {
-    SSL_INDUSTRIAL: 'SSL Industrial',
-    FORESTAL: 'Forestal',
     TH: 'Talento Humano',
-    LOGISTICA: 'Logística',
-    AMBIENTAL: 'Ambiental',
-    COMPRAS: 'Compras',
-    SOCIAL: 'Social',
-    FINANZAS: 'Finanzas',
-    INDUSTRIAL: 'Industrial'
+    SSL: 'Seguridad y Salud Laboral',
+    REDES: 'Redes Sociales',
+    QCYS: 'Quejas, Consultas y Sugerencias',
+    PROGRAMAS: 'Programas Sociales'
   }
 };
 
@@ -374,15 +370,19 @@ const FormModule = (() => {
     if (!container) return;
     container.innerHTML = '';
 
-    // Determinar sección por prefijo del id_indicador (ej: TH_001 → "TH")
-    // O bien agrupamos todos en una sola sección si no hay info de grupo
+    // Agrupar indicadores por sub-sección basada en el sufijo después de " — "
+    // Ejemplo: "Mujeres — Industrial" → sección "Industrial"
+    //          "Quejas recibidas"      → sección "General"
     const sections = {};
     indicadores.forEach(ind => {
-      // Usamos la parte antes del primer "_"... pero el módulo ya es el agrupador de sección.
-      // Para sub-secciones, podemos usar rangos de orden (1-5 = sección A, 6-10 = B, etc.)
-      // Por simplicidad: agrupamos cada 5 indicadores en una sección, o todos juntos.
-      // En producción se puede agregar columna "seccion" al diccionario.
-      const sec = 'Indicadores';
+      const nombre = String(ind.indicador || '');
+      const dashPos = nombre.indexOf(' — ');
+      let sec;
+      if (dashPos > -1) {
+        sec = nombre.substring(dashPos + 3).trim(); // "Industrial", "Forestal", "Instagram", etc.
+      } else {
+        sec = 'General';
+      }
       if (!sections[sec]) sections[sec] = [];
       sections[sec].push(ind);
     });
@@ -885,11 +885,34 @@ const Router = (() => {
       const firstMod = (modulos_permitidos || [])[0];
       if (firstMod) {
         await FormModule.load(firstMod);
+        // Prefetch: cargar el resto de módulos en background para cambio instantáneo
+        prefetchModulos(modulos_permitidos, firstMod);
       } else {
         UI.setHtml('view-loading',
           `<div class="empty-state"><div class="icon">🚫</div><p>Sin módulos asignados</p><span>Contactá al administrador</span></div>`);
         UI.show('view-loading');
       }
+    }
+  }
+
+  /**
+   * Precarga indicadores y período activo de todos los módulos en background.
+   * Esto hace que el cambio de pestaña sea instantáneo.
+   */
+  function prefetchModulos(modulos, excludeMod) {
+    const toLoad = (modulos || Object.keys(CONFIG.MODULOS_LABELS)).filter(m => m !== excludeMod);
+    toLoad.forEach(mod => {
+      if (!State.indicadoresCache[mod]) {
+        API.getIndicadores(mod).then(r => {
+          State.indicadoresCache[mod] = r.indicadores || [];
+        }).catch(() => { }); // silencioso si falla
+      }
+    });
+    // También precargar período activo si no lo tenemos
+    if (!State.periodoActivo) {
+      API.getPeriodoActivo().then(r => {
+        if (r.periodo) State.periodoActivo = r.periodo;
+      }).catch(() => { });
     }
   }
 
