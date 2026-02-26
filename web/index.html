@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Sistema de carga mensual de indicadores operacionales y de impacto social — PARACEL" />
+  <meta name="theme-color" content="#1d4ed8" />
+  <title>Indicadores Mensuales — PARACEL</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- Skip link para accesibilidad de teclado -->
+  <a class="skip-link" href="#main-content">Ir al contenido principal</a>
+
+  <!-- Región de mensajes accesibles aria-live -->
+  <div id="a11y-live" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <!-- ─── PANTALLA LOGIN ───────────────────────────────────────── -->
+  <div id="screen-login" role="main" aria-label="Inicio de sesión">
+    <div class="login-card">
+      <div class="login-logo">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+          <rect width="48" height="48" rx="12" fill="#1d4ed8"/>
+          <path d="M12 34V14h8c4.4 0 8 3.2 8 7s-3.6 7-8 7h-4v6h-4zm4-10h4c2.2 0 4-1.3 4-3s-1.8-3-4-3h-4v6z" fill="white"/>
+          <path d="M30 34V24h-4v-4h12v4h-4v10h-4z" fill="white" opacity=".7"/>
+        </svg>
+        <h1>PARACEL</h1>
+        <p>Sistema de Indicadores Mensuales</p>
+      </div>
+
+      <div id="login-error" class="alert alert-error hidden" role="alert" aria-live="assertive">
+        <span class="alert-icon" aria-hidden="true">⚠</span>
+        <span id="login-error-msg">Error de autenticación</span>
+      </div>
+
+      <form id="form-login" novalidate>
+        <div class="form-group">
+          <label for="input-usuario">Usuario</label>
+          <input
+            type="text"
+            id="input-usuario"
+            name="usuario"
+            autocomplete="username"
+            required
+            placeholder="Ingresa tu usuario"
+            aria-required="true"
+            aria-describedby="usuario-error"
+          />
+          <span id="usuario-error" class="form-error hidden" role="alert">El usuario es requerido</span>
+        </div>
+
+        <div class="form-group">
+          <label for="input-password">Contraseña</label>
+          <input
+            type="password"
+            id="input-password"
+            name="password"
+            autocomplete="current-password"
+            required
+            placeholder="Ingresa tu contraseña"
+            aria-required="true"
+            aria-describedby="password-error"
+          />
+          <span id="password-error" class="form-error hidden" role="alert">La contraseña es requerida</span>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full" id="btn-login">
+          <span id="btn-login-text">Ingresar</span>
+          <span id="btn-login-spinner" class="spinner-sm hidden" aria-hidden="true"></span>
+        </button>
+      </form>
+
+      <p class="text-sm text-muted mt-4" style="text-align:center">
+        ¿Problemas para ingresar? Contactá al administrador del sistema.
+      </p>
+    </div>
+  </div>
+
+  <!-- ─── APP SHELL (visible después del login) ──────────────── -->
+  <div id="screen-app" class="hidden">
+
+    <!-- Header fijo -->
+    <header class="app-header" role="banner">
+      <div class="brand" id="header-module-name" aria-live="polite">PARACEL</div>
+      <div class="header-meta">
+        <span id="header-periodo"></span>
+        <span id="header-estado-badge" class="badge" style="margin-left:8px"></span>
+      </div>
+      <button class="btn-logout" id="btn-logout" aria-label="Cerrar sesión">
+        ⏻ Salir
+      </button>
+    </header>
+
+    <!-- Contenido principal -->
+    <main id="main-content" class="main-content">
+      <div class="app-container">
+
+        <!-- Tabs (visible para COORDINADOR y ADMIN) -->
+        <nav id="tabs-nav" class="tabs-bar hidden" aria-label="Módulos disponibles" role="tablist">
+          <!-- Tabs renderizados dinámicamente -->
+        </nav>
+
+        <!-- Panel principal -->
+        <div id="panel-main" role="tabpanel" aria-live="polite">
+
+          <!-- ─ Vista USER: formulario directo ─────────────────── -->
+          <div id="view-form" class="hidden">
+            <!-- Encabezado del módulo -->
+            <div class="module-header" id="module-header-info" role="region" aria-label="Información del módulo">
+              <div class="module-header-item">
+                <span class="label">Módulo</span>
+                <span class="value" id="mh-modulo">—</span>
+              </div>
+              <div class="module-header-item">
+                <span class="label">Período</span>
+                <span class="value" id="mh-periodo">—</span>
+              </div>
+              <div class="module-header-item">
+                <span class="label">Estado</span>
+                <span class="value" id="mh-estado">—</span>
+              </div>
+              <div class="module-header-item">
+                <span class="label">Responsable</span>
+                <span class="value" id="mh-usuario">—</span>
+              </div>
+            </div>
+
+            <!-- Resumen de errores -->
+            <div id="error-summary" class="error-summary hidden" role="alert" aria-label="Errores en el formulario">
+              <h4>⚠ Hay campos con errores</h4>
+              <ul id="error-summary-list"></ul>
+            </div>
+
+            <!-- Contenedor de secciones/indicadores -->
+            <div id="form-sections" aria-label="Indicadores del módulo">
+              <!-- Renderizado dinámicamente por app.js -->
+            </div>
+
+            <!-- Barra de acciones sticky -->
+            <div class="action-bar" role="group" aria-label="Acciones del formulario">
+              <div class="save-status" id="save-status" aria-live="polite" aria-atomic="true">
+                Sin cambios guardados
+              </div>
+              <div class="btn-group">
+                <button class="btn btn-secondary" id="btn-draft" aria-label="Guardar borrador">
+                  💾 Borrador
+                </button>
+                <button class="btn btn-success" id="btn-submit" aria-label="Enviar indicadores">
+                  ✓ Enviar
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ─ Vista ADMIN: tablero de control ────────────────── -->
+          <div id="view-admin" class="hidden">
+            <div class="flex justify-between align-center mb-6">
+              <h2>Tablero de Control</h2>
+              <span id="admin-badge" class="badge badge-info">ADMIN</span>
+            </div>
+
+            <!-- Filtros -->
+            <div class="filters-bar" role="search" aria-label="Filtros del tablero">
+              <div class="filter-item">
+                <label for="filter-periodo">Período</label>
+                <select id="filter-periodo" aria-label="Filtrar por período">
+                  <option value="">Seleccionar...</option>
+                </select>
+              </div>
+              <div class="filter-item">
+                <label for="filter-modulo">Módulo</label>
+                <select id="filter-modulo" aria-label="Filtrar por módulo">
+                  <option value="">Todos</option>
+                </select>
+              </div>
+              <div class="filter-item" style="justify-content:flex-end;align-items:flex-end;">
+                <button class="btn btn-primary btn-sm" id="btn-refresh-control" aria-label="Actualizar tablero">
+                  🔄 Actualizar
+                </button>
+              </div>
+              <div class="filter-item" style="justify-content:flex-end;align-items:flex-end;">
+                <button class="btn btn-ghost btn-sm" id="btn-export-csv" aria-label="Exportar a CSV">
+                  📥 Exportar CSV
+                </button>
+              </div>
+            </div>
+
+            <!-- Grid de tarjetas de control -->
+            <div id="control-grid" class="control-grid" aria-label="Estado de completitud por módulo">
+              <!-- Renderizado dinámicamente -->
+            </div>
+
+            <!-- Tabla de últimos cambios -->
+            <div class="card mt-6">
+              <div class="card-header">
+                <h3 class="card-title">Últimas capturas</h3>
+              </div>
+              <div style="overflow-x:auto">
+                <table class="data-table" id="table-recent" aria-label="Últimas capturas registradas">
+                  <thead>
+                    <tr>
+                      <th scope="col">Módulo</th>
+                      <th scope="col">Indicador</th>
+                      <th scope="col">Valor</th>
+                      <th scope="col">Estado</th>
+                      <th scope="col">Usuario</th>
+                      <th scope="col">Timestamp</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbody-recent">
+                    <tr><td colspan="6" class="empty-state"><span>Selecciona un período para ver datos</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Gestión de períodos (solo ADMIN) -->
+            <div class="card mt-6" id="section-periodos">
+              <div class="card-header">
+                <h3 class="card-title">Gestión de Períodos</h3>
+                <button class="btn btn-primary btn-sm" id="btn-nuevo-periodo" aria-label="Crear nuevo período">
+                  + Nuevo período
+                </button>
+              </div>
+              <div style="overflow-x:auto">
+                <table class="data-table" id="table-periodos" aria-label="Lista de períodos">
+                  <thead>
+                    <tr>
+                      <th scope="col">Período</th>
+                      <th scope="col">Estado</th>
+                      <th scope="col">Apertura</th>
+                      <th scope="col">Cierre</th>
+                      <th scope="col">Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbody-periodos">
+                    <tr><td colspan="5"><span class="text-muted">Cargando...</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Estado de carga inicial -->
+          <div id="view-loading" class="empty-state">
+            <div class="icon">⏳</div>
+            <p>Cargando datos...</p>
+          </div>
+
+        </div><!-- /panel-main -->
+      </div><!-- /app-container -->
+    </main>
+  </div><!-- /screen-app -->
+
+  <!-- ─── TOAST CONTAINER ─────────────────────────────────────── -->
+  <div id="toast-container" aria-live="assertive" aria-atomic="false" role="status"></div>
+
+  <!-- ─── MODAL INFO INDICADOR ────────────────────────────────── -->
+  <div id="modal-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-content">
+      <h3 class="modal-title" id="modal-title">Información del indicador</h3>
+      <div id="modal-body" style="color:var(--text-muted);line-height:1.6;margin-bottom:1.5rem"></div>
+      <button class="btn btn-ghost btn-full" id="btn-modal-close" aria-label="Cerrar información">
+        Cerrar
+      </button>
+    </div>
+  </div>
+
+  <!-- ─── MODAL CONFIRMACIÓN ENVÍO ────────────────────────────── -->
+  <div id="modal-confirm" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+    <div class="modal-content">
+      <h3 class="modal-title" id="confirm-title">✓ Confirmar envío</h3>
+      <p style="color:var(--text-muted);margin-bottom:1.5rem">
+        Al enviar, el registro quedará en estado <strong>ENVIADO</strong>.
+        En períodos normales, no podrás modificarlo después.<br><br>
+        ¿Estás seguro/a de que todos los valores son correctos?
+      </p>
+      <div class="btn-group" style="justify-content:flex-end">
+        <button class="btn btn-ghost" id="btn-confirm-cancel">Cancelar</button>
+        <button class="btn btn-success" id="btn-confirm-ok">Sí, Enviar ✓</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── MODAL NUEVO PERÍODO ──────────────────────────────────── -->
+  <div id="modal-periodo" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="periodo-title">
+    <div class="modal-content">
+      <h3 class="modal-title" id="periodo-title">Nuevo / Editar Período</h3>
+      <div class="form-group">
+        <label for="input-nuevo-periodo">Período (YYYY-MM)</label>
+        <input type="text" id="input-nuevo-periodo" placeholder="2026-03" maxlength="7"
+               pattern="\d{4}-\d{2}" aria-describedby="periodo-hint"/>
+        <span id="periodo-hint" class="form-hint">Formato: 2026-03</span>
+      </div>
+      <div class="form-group">
+        <label for="select-periodo-estado">Estado inicial</label>
+        <select id="select-periodo-estado">
+          <option value="ABIERTO">ABIERTO</option>
+          <option value="REVISION">REVISION</option>
+          <option value="CERRADO">CERRADO</option>
+        </select>
+      </div>
+      <div class="btn-group" style="justify-content:flex-end;margin-top:1.5rem">
+        <button class="btn btn-ghost" id="btn-periodo-cancel">Cancelar</button>
+        <button class="btn btn-primary" id="btn-periodo-save">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── LOADING OVERLAY ─────────────────────────────────────── -->
+  <div id="loading-overlay" class="loading-overlay hidden" role="status" aria-label="Cargando">
+    <div class="spinner" aria-hidden="true"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

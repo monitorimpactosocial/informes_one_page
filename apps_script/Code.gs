@@ -720,7 +720,7 @@ function validateTipoDato(valor, tipo_dato, regla_validacion, requerido) {
  * las hojas y cargar datos iniciales.
  */
 function setupInitialData() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
 
   function ensureSheet(name, headers) {
     let sh = ss.getSheetByName(name);
