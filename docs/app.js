@@ -6,7 +6,7 @@
 // ── CONFIG ────────────────────────────────────────────────────
 const CONFIG = {
   // ⚠ Reemplazar esta URL con la de tu Web App de Apps Script
-  API_URL: 'https://script.google.com/macros/s/AKfycbwhfgem7AcjRHlIWDjmwYr0lM8FzUziA_dzyQGiwOxw3Y5rQZ6dLJN6rXniIjwdAnmGMQ/exec',
+  API_URL: 'https://script.google.com/macros/s/AKfycbw_zT0q7gvHcXLD8XDjpf93fRABheBMT3-iJVLOOToVMn1Hd_bzWJ-3DM2qDyLfZs_GWg/exec',
   TOKEN_KEY: 'paracel_token',
   SESSION_KEY: 'paracel_session',
   MODULOS_LABELS: {
